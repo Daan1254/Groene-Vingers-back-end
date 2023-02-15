@@ -2,7 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {TypeOrmModule} from "@nestjs/typeorm";
+import {User} from "./modules/user/user.entity";
 import {UserModule} from "./modules/user/user.module";
+import {AuthModule} from "./modules/auth/auth.module";
+import {AccessToken} from "./modules/auth/access-token.entity";
+
+const { MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, MYSQL_HOST } = process.env;
 
 @Module({
   imports: [
@@ -13,10 +18,12 @@ import {UserModule} from "./modules/user/user.module";
       username: 'root',
       password: '',
       database: 'GroeneVingers',
-      entities: [],
       synchronize: true,
+      entities: [User, AccessToken],
+      dropSchema: true
     }),
-      UserModule
+      UserModule,
+      AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
