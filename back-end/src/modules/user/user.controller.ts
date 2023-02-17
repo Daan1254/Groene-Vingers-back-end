@@ -12,8 +12,8 @@ export class UserController {
         return this.userService.getUser(uuid)
     }
 
-    // @Post('')
-    // public async createUser(@Body() userDto: CreateUserDto) {
-    //     return this.userService.createUser(userDto)
-    // }
+    @Post()
+    public async createUser(@Body() userDto: CreateUserDto) {
+        return this.userService.createUser(userDto)
+    }
 }
