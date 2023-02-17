@@ -1,7 +1,7 @@
 import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common";
 import {PrismaService} from "../../database/prisma.service";
 import {UserService} from "../user/user.service";
-import {compareSync} from "bcrypt";
+import {compareSync, hashSync} from "bcrypt";
 import * as crypto from 'crypto'
 import {LoginDto} from "./dto/login.dto";
 
@@ -72,5 +72,26 @@ export class AuthService {
         })
 
         return token.token
+    }
+
+    async register(loginDto: LoginDto) {
+        const exists = await this.prisma.user.count({
+            where: {
+                email: loginDto.email
+            }
+        }) > 0
+
+        if (exists) {
+            throw new BadRequestException('Dit email is al in gebruik!')
+        }
+
+        await this.prisma.user.create({
+            data: {
+                email: loginDto.email,
+                password: hashSync(loginDto.password, 10)
+            }
+        });
+
+        return "ok"
     }
 }

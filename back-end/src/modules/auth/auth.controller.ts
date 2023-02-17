@@ -13,6 +13,11 @@ export class AuthController {
         return this.authService.login(loginDto)
     }
 
+    @Post('register')
+    public async register(@Body() loginDto: LoginDto) {
+        return this.authService.register(loginDto)
+    }
+
 
     @Get('validate')
     public async validateToken(@Headers('auth-token') token: string) {
