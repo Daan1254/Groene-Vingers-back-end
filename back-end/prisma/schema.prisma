@@ -11,17 +11,27 @@ datasource db {
 }
 
 model User {
-  uuid          String        @id @default(uuid())
+  uuid        String        @id @default(uuid())
   email       String        @unique
   username    String?
   password    String?
   AccessToken AccessToken[]
+  Order       Order[]
 }
 
 model AccessToken {
-  uuid     String @id @default(uuid())
-  token  String @unique
-  user   User   @relation(fields: [userId], references: [uuid])
-  userId String
+  uuid      String   @id @default(uuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [uuid])
+  userId    String
   expiresAt DateTime
+}
+
+model Order {
+  uuid      String @id @default(uuid())
+  user      User   @relation(fields: [userId], references: [uuid])
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  status    String   @default("pending")
 }

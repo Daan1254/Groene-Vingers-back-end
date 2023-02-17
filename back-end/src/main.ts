@@ -2,6 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 
+
+export const KUIN_BASE_URL = process.env.KUIN_API_URL
+export const KUIN_API_KEY = process.env.KUIN_API_KEY
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api')
