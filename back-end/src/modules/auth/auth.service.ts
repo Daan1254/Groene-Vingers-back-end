@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common";
+import {BadRequestException, Injectable, NotFoundException, UnauthorizedException} from "@nestjs/common";
 import {PrismaService} from "../../database/prisma.service";
 import {UserService} from "../user/user.service";
 import {compareSync, hashSync} from "bcrypt";
@@ -22,28 +22,33 @@ export class AuthService {
             throw new BadRequestException('WRONG_PASSWORD')
         }
 
-        return await this.generateToken(user.uuid)
+        return {token: await this.generateToken(user.uuid)}
     }
 
     public async validateToken(token: string) {
-        const accessToken = await this.prisma.accessToken.findUnique({
-            where: {
-                token
-            },
-            include: {
-                user: true
+        try {
+            const accessToken = await this.prisma.accessToken.findUnique({
+                where: {
+                    token
+                },
+                include: {
+                    user: true
+                }
+            })
+
+            if (!accessToken) {
+                throw new UnauthorizedException('Token not found')
             }
-        })
 
-        if (!accessToken) {
-            throw new NotFoundException('Token not found')
+            if (accessToken.expiresAt < new Date()) {
+                throw new UnauthorizedException('Token expired')
+            }
+
+            return accessToken.user
+        } catch (e) {
+            throw new UnauthorizedException('Token not found')
         }
 
-        if (accessToken.expiresAt < new Date()) {
-            throw new BadRequestException('Token expired')
-        }
-
-        return accessToken
     }
 
     private async generateToken(uuid: string) {

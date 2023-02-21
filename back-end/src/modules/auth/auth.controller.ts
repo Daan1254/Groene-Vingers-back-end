@@ -1,6 +1,7 @@
-import {Body, Controller, Get, Headers, Post} from "@nestjs/common";
+import {Body, Controller, Get, Headers, Post, Req, UnauthorizedException, UseGuards} from "@nestjs/common";
 import {AuthService} from "./auth.service";
 import {LoginDto} from "./dto/login.dto";
+import {AuthGuard, RequestWithAuth} from "./auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +21,11 @@ export class AuthController {
 
 
     @Get('validate')
-    public async validateToken(@Headers('auth-token') token: string) {
-        return this.authService.validateToken(token)
+    @UseGuards(AuthGuard)
+    public async validateToken(@Req() req: RequestWithAuth) {
+        if (!req.user) {
+            throw new UnauthorizedException('User not found')
+        }
+        return req.user
     }
 }
