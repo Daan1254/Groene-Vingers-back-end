@@ -10,8 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
-  uuid          String        @id @default(uuid())
+  uuid        String        @id @default(uuid())
   email       String        @unique
   username    String?
   password    String?
@@ -19,9 +20,26 @@ model User {
 }
 
 model AccessToken {
-  uuid     String @id @default(uuid())
-  token  String @unique
-  user   User   @relation(fields: [userId], references: [uuid])
-  userId String
+  uuid      String   @id @default(uuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [uuid])
+  userId    String
   expiresAt DateTime
+}
+
+model Product {
+  uuid    String             @id @default(uuid())
+  name    String
+  price   String?
+  soldOut Boolean            @default(false)
+  active  Boolean            @default(true)
+  images  Image[]
+}
+
+
+model Image {
+  uuid        String   @id @default(uuid())
+  url         String
+  product     Product? @relation(fields: [productUuid], references: [uuid])
+  productUuid String?
 }
