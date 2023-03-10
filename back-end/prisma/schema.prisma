@@ -10,36 +10,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AbsenceType {
+  SICK
+  VACATION
+  OTHER
+}
 
 model User {
-  uuid        String        @id @default(uuid())
-  email       String        @unique
-  username    String?
-  password    String?
-  AccessToken AccessToken[]
+  uuid           String           @id @default(uuid())
+  email          String           @unique
+  username       String?
+  password       String?
+  indisposed     Boolean          @default(false)
+  AccessToken    AccessToken[]
+  ShoppingCart   ShoppingCart?
+  absenceReports AbsenceReports[]
+}
+
+model AbsenceReports {
+  uuid     String      @id @default(uuid())
+  user     User        @relation(fields: [userUuid], references: [uuid])
+  userUuid String
+  date     DateTime
+  active   Boolean     @default(true)
+  type     AbsenceType
 }
 
 model AccessToken {
   uuid      String   @id @default(uuid())
   token     String   @unique
-  user      User     @relation(fields: [userId], references: [uuid])
-  userId    String
+  user      User     @relation(fields: [userUuid], references: [uuid])
+  userUuid  String
   expiresAt DateTime
 }
 
-model Product {
-  uuid    String             @id @default(uuid())
-  name    String
-  price   String?
-  soldOut Boolean            @default(false)
-  active  Boolean            @default(true)
-  images  Image[]
+model ShoppingCart {
+  uuid                   String                  @id @default(uuid())
+  user                   User                    @relation(fields: [userUuid], references: [uuid])
+  userUuid               String                  @unique
+  productsOnShoppingCart ProductOnShoppingCart[]
 }
 
-
-model Image {
-  uuid        String   @id @default(uuid())
-  url         String
-  product     Product? @relation(fields: [productUuid], references: [uuid])
-  productUuid String?
+model ProductOnShoppingCart {
+  uuid           String       @id @default(uuid())
+  shoppingCart   ShoppingCart @relation(fields: [shoppingCartId], references: [uuid])
+  shoppingCartId String
+  productId      String
+  quantity       Int          @default(1)
 }
