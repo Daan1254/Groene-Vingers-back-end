@@ -22,4 +22,18 @@ export class ProductService {
             console.error(e)
         }
     }
+
+    async getProduct(id) {
+        try {
+            const response = await this.httpService.get(`${KUIN_BASE_URL}/product/${id}`,{
+                headers: {
+                    Authorization: `Bearer ${process.env.KUIN_API_KEY}`
+                }
+            }).toPromise()
+
+            return response.data
+        } catch(e) {
+            console.error(e)
+        }
+    }
 }
