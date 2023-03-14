@@ -8,6 +8,6 @@ import {PrismaService} from "../../database/prisma.service";
     controllers: [ProductController],
     providers: [ProductService, PrismaService],
     imports: [HttpModule],
-    exports: []
+    exports: [ProductService]
 })
 export class ProductModule{}

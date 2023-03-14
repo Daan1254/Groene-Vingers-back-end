@@ -1,9 +1,10 @@
-import {Injectable, Logger, NotFoundException} from "@nestjs/common";
+import {BadRequestException, Injectable, Logger, NotFoundException} from "@nestjs/common";
 import {PrismaService} from "../../database/prisma.service";
+import {ProductService} from "../product/product.service";
 
 @Injectable()
 export class ShoppingCartService {
-    constructor(private readonly prisma: PrismaService) {
+    constructor(private readonly prisma: PrismaService, private readonly productService: ProductService) {
 
     }
 
@@ -31,8 +32,14 @@ export class ShoppingCartService {
         }
     }
 
-    async addProductToShoppingCart(uuid: string, productUuid: string) {
+    async addProductToShoppingCart(uuid: string, productId: string) {
         try {
+            const product = await this.productService.getProduct(productId)
+
+            if (!product) {
+                throw new NotFoundException('Product niet gevonden')
+            }
+
             const shoppingCart = await this.prisma.shoppingCart.findUnique({
                 where: {
                     userUuid: uuid
@@ -45,7 +52,7 @@ export class ShoppingCartService {
                         userUuid: uuid,
                         productsOnShoppingCart: {
                             create: {
-                                productId: productUuid
+                                productId: productId
                             }
                         }
                     }
@@ -54,7 +61,7 @@ export class ShoppingCartService {
 
             const productOnShoppingCart = await this.prisma.productOnShoppingCart.findFirst({
                 where: {
-                    productId: productUuid,
+                    productId: productId,
                     shoppingCartId: shoppingCart.uuid
                 }
             })
@@ -91,7 +98,7 @@ export class ShoppingCartService {
                 data: {
                     productsOnShoppingCart: {
                         create: {
-                            productId: productUuid
+                            productId: productId
                         }
                     }
                 },
@@ -104,68 +111,60 @@ export class ShoppingCartService {
         }
     }
 
-    async removeProductFromShoppingCart(uuid: string, productUuid: string) {
+    async removeProductFromShoppingCart(uuid: string, productId: string) {
         try {
-            const shoppingCart = await this.prisma.shoppingCart.count({
-                where: {
-                    userUuid: uuid
-                }
-            })
+            const kuinProduct = await this.productService.getProduct(productId)
 
-            if (shoppingCart === 0) {
-                throw new NotFoundException('Shopping cart not found')
+            if (!kuinProduct) {
+                throw new NotFoundException('Product niet gevonden')
             }
 
-
-            const productOnShoppingCart = await this.prisma.productOnShoppingCart.findFirst({
-                where: {
-                    productId: productUuid,
-                    shoppingCartId: shoppingCart.uuid
-                }
-            })
-
-            if (productOnShoppingCart) {
-                return await this.prisma.shoppingCart.update({
-                    where: {
-                        userUuid: uuid
-                    },
-                    data: {
-                        productsOnShoppingCart: {
-                            update: {
-                                where: {
-                                    uuid: productOnShoppingCart.uuid
-                                },
-                                data: {
-                                    quantity: {
-                                        decrement: 1
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    include: {
-                        productsOnShoppingCart: true
-                    }
-                })
-            }
-
-            return await this.prisma.shoppingCart.update({
+            const shoppingCart = await this.prisma.shoppingCart.findUnique({
                 where: {
                     userUuid: uuid
-                },
-                data: {
-                    productsOnShoppingCart: {
-                        create: {
-                            productId: productUuid
-                        }
-                    }
                 },
                 include: {
                     productsOnShoppingCart: true
                 }
             })
+
+            if (!shoppingCart) {
+                throw new NotFoundException('Shopping cart not found')
+            }
+            const product = shoppingCart.productsOnShoppingCart.find(product => product.productId === productId)
+
+            if (product) {
+                if (product.quantity <= 1) {
+                    await this.prisma.productOnShoppingCart.delete({
+                        where: {
+                            uuid: product.uuid
+                        }
+                    })
+
+                    return shoppingCart
+                }
+
+                await this.prisma.productOnShoppingCart.update({
+                    where: {
+                        uuid: product.uuid
+                    },
+                    data: {
+                        quantity: {
+                            decrement: 1
+                        }
+                    }
+                })
+                return shoppingCart
+            }
+
+            throw new NotFoundException('Product not found')
         } catch(e) {
             Logger.error(e)
+            if (e.status === 404) {
+                throw new NotFoundException(e.message)
+            } else {
+                throw new BadRequestException(e.message)
+            }
         }
     }
 }

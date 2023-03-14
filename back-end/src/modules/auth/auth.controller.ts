@@ -2,7 +2,9 @@ import {Body, Controller, Get, Headers, Post, Req, UnauthorizedException, UseGua
 import {AuthService} from "./auth.service";
 import {LoginDto} from "./dto/login.dto";
 import {AuthGuard, RequestWithAuth} from "./auth.guard";
+import {ApiHeaders, ApiTags} from "@nestjs/swagger";
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 
@@ -22,6 +24,7 @@ export class AuthController {
 
     @Get('validate')
     @UseGuards(AuthGuard)
+    @ApiHeaders([{name: 'auth-token', description: 'Groene vingers API token'}])
     public async validateToken(@Req() req: RequestWithAuth) {
         if (!req.user) {
             throw new UnauthorizedException('User not found')
