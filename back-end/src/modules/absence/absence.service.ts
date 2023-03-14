@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, Logger, UnauthorizedException} from "@nestjs/common";
+import {BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException} from "@nestjs/common";
 import {PrismaService} from "../../database/prisma.service";
 import {CreateAbsenceDto} from "./dto/create-absence.dto";
 import {UserService} from "../user/user.service";
@@ -18,6 +18,10 @@ export class AbsenceService {
                 }
             })
 
+            if (!absence) {
+                throw new NotFoundException('je hebt geen afwezigheden op je naam')
+            }
+
             if (absence.user.uuid !== userUuid) {
                 throw new UnauthorizedException('U bent niet bevoegd om deze afwezigheid te bekijken.')
             }
@@ -28,6 +32,8 @@ export class AbsenceService {
 
             if (e.status === 401) {
                 throw new UnauthorizedException(e.message)
+            } else if (e.status === 404) {
+                throw new NotFoundException(e.message)
             }
         }
     }
