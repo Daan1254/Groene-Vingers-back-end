@@ -72,7 +72,6 @@ export class AbsenceService {
                     absenceReports: {
                         create: {
                             ...body,
-                            date: Date.parse(body.date)
                         }
                     }
                 },
