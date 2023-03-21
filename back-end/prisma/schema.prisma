@@ -25,6 +25,7 @@ model User {
   AccessToken    AccessToken[]
   ShoppingCart   ShoppingCart?
   absenceReports AbsenceReports[]
+  admin          Boolean          @default(false)
 }
 
 model AbsenceReports {
