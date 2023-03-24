@@ -7,11 +7,11 @@ import {UserService} from "../user/user.service";
 export class AbsenceService {
     constructor(private readonly prisma: PrismaService, private readonly userService: UserService) {}
 
-    async getAbsence(uuid: string, userUuid: string) {
+    async getAbsence(userUuid: string) {
         try {
-            const absence = await this.prisma.absenceReports.findUnique({
+            const absence = await this.prisma.absenceReports.findFirst({
                 where: {
-                    uuid
+                    userUuid,
                 },
                 include: {
                     user: true

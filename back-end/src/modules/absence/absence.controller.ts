@@ -11,11 +11,11 @@ export class AbsenceController {
     constructor(private readonly absenceService: AbsenceService) {}
 
 
-    @Get(':uuid')
+    @Get('')
     @ApiHeaders([{name: 'auth-token', description: 'Groene vingers API token'}])
     @UseGuards(AuthGuard)
-    public async getAbsence(@Param('uuid') uuid: string, @Req() req: RequestWithAuth) {
-        return await this.absenceService.getAbsence(uuid, req.user.uuid)
+    public async getAbsence(@Req() req: RequestWithAuth) {
+        return await this.absenceService.getAbsence(req.user.uuid)
     }
 
     @Get('user')
