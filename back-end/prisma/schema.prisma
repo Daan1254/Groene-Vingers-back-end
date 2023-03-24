@@ -28,6 +28,20 @@ model User {
   admin          Boolean          @default(false)
 }
 
+model Category {
+  uuid         String              @id @default(uuid())
+  name         String              @unique
+  thumbnailUrl String?
+  products     ProductOnCategory[]
+}
+
+model ProductOnCategory {
+  uuid         String   @id @default(uuid())
+  category     Category @relation(fields: [categoryUuid], references: [uuid])
+  categoryUuid String
+  productId    String
+}
+
 model AbsenceReports {
   uuid     String      @id @default(uuid())
   user     User        @relation(fields: [userUuid], references: [uuid])
@@ -58,4 +72,9 @@ model ProductOnShoppingCart {
   shoppingCartId String
   productId      String
   quantity       Int          @default(1)
+}
+
+model Settings {
+  application       String  @unique
+  categoriesEnabled Boolean @default(true)
 }
