@@ -2,7 +2,7 @@ import {Body, Controller, Get, Param, Post, Req, UseGuards} from "@nestjs/common
 import {AbsenceService} from "./absence.service";
 import {AuthGuard, RequestWithAuth} from "../auth/auth.guard";
 import {CreateAbsenceDto} from "./dto/create-absence.dto";
-import {ApiBody, ApiHeaders, ApiParam, ApiTags} from "@nestjs/swagger";
+import {ApiBody, ApiHeaders, ApiTags} from "@nestjs/swagger";
 
 @ApiTags('Absence')
 @Controller('absence')
