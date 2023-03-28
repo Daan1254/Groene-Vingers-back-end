@@ -1,4 +1,4 @@
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 export enum AbsenceType {
     SICK = 'SICK',
     VACATION = 'VACATION',
@@ -6,11 +6,10 @@ export enum AbsenceType {
 }
 export class CreateAbsenceDto {
     @ApiProperty({
-        type: Date,
-        format: 'date',
+        type: String,
         nullable: false
     })
-    date: Date
+    date: string
 
     @ApiProperty({
         type: String,

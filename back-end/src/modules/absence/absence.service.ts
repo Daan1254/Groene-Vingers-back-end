@@ -1,11 +1,11 @@
-import {BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException} from "@nestjs/common";
-import {PrismaService} from "../../database/prisma.service";
-import {CreateAbsenceDto} from "./dto/create-absence.dto";
-import {UserService} from "../user/user.service";
+import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { PrismaService } from "../../database/prisma.service";
+import { CreateAbsenceDto } from "./dto/create-absence.dto";
+import { UserService } from "../user/user.service";
 
 @Injectable()
 export class AbsenceService {
-    constructor(private readonly prisma: PrismaService, private readonly userService: UserService) {}
+    constructor(private readonly prisma: PrismaService, private readonly userService: UserService) { }
 
     async getAbsence(userUuid: string) {
         try {
@@ -27,7 +27,7 @@ export class AbsenceService {
             }
 
             return absence
-        } catch(e) {
+        } catch (e) {
             console.error(e)
 
             if (e.status === 401) {
@@ -49,7 +49,7 @@ export class AbsenceService {
                     user: true
                 }
             })
-        } catch(e) {
+        } catch (e) {
             console.error(e)
         }
     }
@@ -71,7 +71,8 @@ export class AbsenceService {
                     indisposed: true,
                     absenceReports: {
                         create: {
-                            ...body,
+                            date: new Date(Date.parse(body.date)),
+                            type: body.type
                         }
                     }
                 },
@@ -79,7 +80,7 @@ export class AbsenceService {
                     absenceReports: true
                 }
             })
-        } catch(e) {
+        } catch (e) {
             Logger.error(e.message)
             throw new BadRequestException(e.message)
         }
