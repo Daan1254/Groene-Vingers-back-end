@@ -25,8 +25,7 @@ model User {
   AccessToken    AccessToken[]
   ShoppingCart   ShoppingCart?
   absenceReports AbsenceReports[]
-  cashier        Cashier?         @relation(fields: [cashierUuid], references: [uuid])
-  cashierUuid    String?
+  pin            String?
 }
 
 model AbsenceReports {
@@ -44,14 +43,6 @@ model AccessToken {
   user      User     @relation(fields: [userUuid], references: [uuid])
   userUuid  String
   expiresAt DateTime
-}
-
-model Cashier {
-  uuid        String  @id @default(uuid())
-  cashierName String
-  pin         String? @unique
-  active      Boolean @default(true)
-  User        User[]
 }
 
 model ShoppingCart {
