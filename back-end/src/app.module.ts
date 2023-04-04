@@ -7,13 +7,15 @@ import {AuthModule} from "./modules/auth/auth.module";
 import {ProductModule} from "./modules/product/product.module";
 import {AbsenceModule} from "./modules/absence/absence.module";
 import {ShoppingCartModule} from "./modules/shopping-cart/shopping-cart.module";
+import {CategoryModule} from "./modules/category/category.module";
 @Module({
   imports: [
       UserModule,
       AuthModule,
       ProductModule,
       AbsenceModule,
-      ShoppingCartModule
+      ShoppingCartModule,
+      CategoryModule
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
