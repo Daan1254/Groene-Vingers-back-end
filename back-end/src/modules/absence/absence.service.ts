@@ -84,4 +84,50 @@ export class AbsenceService {
             throw new BadRequestException(e.message)
         }
     }
+
+    async reportBetter(uuid: string) {
+        try {
+            const user = await this.userService.getUser(uuid)
+
+
+            const absence = await this.prisma.absenceReports.findFirst({
+                where: {
+                    user: {
+                        uuid
+                    },
+                    active: true
+                }
+            })
+
+
+            if (!user.indisposed) {
+                throw new BadRequestException('U bent niet afwezig.')
+            }
+
+            await this.prisma.user.update({
+                where: {
+                    uuid
+                },
+                data: {
+                    indisposed: false
+                }
+            })
+
+            if (!absence) {
+                throw new BadRequestException('No active absence found')
+            }
+
+            return await this.prisma.absenceReports.update({
+                where: {
+                    uuid: absence.uuid
+                },
+                data: {
+                    active: false
+                }
+            })
+        } catch(e) {
+            Logger.error(e.message)
+            throw new BadRequestException(e.message)
+        }
+    }
 }

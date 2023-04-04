@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Req, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Param, Post, Put, Req, UseGuards} from "@nestjs/common";
 import {AbsenceService} from "./absence.service";
 import {AuthGuard, RequestWithAuth} from "../auth/auth.guard";
 import {CreateAbsenceDto} from "./dto/create-absence.dto";
@@ -31,5 +31,12 @@ export class AbsenceController {
     @ApiHeaders([{name: 'auth-token', description: 'Groene vingers API token'}])
     createAbsence(@Req() req: RequestWithAuth, @Body() body: CreateAbsenceDto) {
         return this.absenceService.createAbsence(body, req.user.uuid)
+    }
+
+    @Put('')
+    @UseGuards(AuthGuard)
+    @ApiHeaders([{name: 'auth-token', description: 'Groene vingers API token'}])
+    reportBetter(@Req() req: RequestWithAuth) {
+        return this.absenceService.reportBetter(req.user.uuid)
     }
 }
