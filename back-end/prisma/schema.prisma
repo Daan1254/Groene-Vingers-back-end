@@ -26,6 +26,17 @@ model User {
   ShoppingCart   ShoppingCart?
   absenceReports AbsenceReports[]
   admin          Boolean          @default(false)
+  appointments   Appointment[]
+}
+
+model Appointment {
+  uuid        String   @id @default(uuid())
+  user        User     @relation(fields: [userUuid], references: [uuid])
+  userUuid    String
+  date        DateTime
+  title       String
+  description String?
+  active      Boolean  @default(true)
 }
 
 model Category {
