@@ -36,7 +36,6 @@ model Appointment {
   date        DateTime
   title       String
   description String?
-  active      Boolean  @default(true)
 }
 
 model Category {

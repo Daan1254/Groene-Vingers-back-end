@@ -5,8 +5,8 @@ import { ScheduleService } from "./schedule.service";
 
 @Module({
     controllers: [ScheduleController],
-    providers: [ScheduleService, PrismaService],
     imports: [],
+    providers: [ScheduleService, PrismaService],
     exports: []
 })
 export class ScheduleModule {}
