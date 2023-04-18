@@ -1,17 +1,17 @@
-import {BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException} from "@nestjs/common";
-import {PrismaService} from "../../database/prisma.service";
-import {CreateAbsenceDto} from "./dto/create-absence.dto";
-import {UserService} from "../user/user.service";
+import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { PrismaService } from "../../database/prisma.service";
+import { CreateAbsenceDto } from "./dto/create-absence.dto";
+import { UserService } from "../user/user.service";
 
 @Injectable()
 export class AbsenceService {
-    constructor(private readonly prisma: PrismaService, private readonly userService: UserService) {}
+    constructor(private readonly prisma: PrismaService, private readonly userService: UserService) { }
 
-    async getAbsence(uuid: string, userUuid: string) {
+    async getAbsence(userUuid: string) {
         try {
-            const absence = await this.prisma.absenceReports.findUnique({
+            const absence = await this.prisma.absenceReports.findFirst({
                 where: {
-                    uuid
+                    userUuid,
                 },
                 include: {
                     user: true
@@ -27,7 +27,7 @@ export class AbsenceService {
             }
 
             return absence
-        } catch(e) {
+        } catch (e) {
             console.error(e)
 
             if (e.status === 401) {
@@ -49,7 +49,7 @@ export class AbsenceService {
                     user: true
                 }
             })
-        } catch(e) {
+        } catch (e) {
             console.error(e)
         }
     }
@@ -71,12 +71,59 @@ export class AbsenceService {
                     indisposed: true,
                     absenceReports: {
                         create: {
-                            ...body,
+                            date: new Date(Date.parse(body.date)),
+                            type: body.type
                         }
                     }
                 },
                 include: {
                     absenceReports: true
+                }
+            })
+        } catch (e) {
+            Logger.error(e.message)
+            throw new BadRequestException(e.message)
+        }
+    }
+
+    async reportBetter(uuid: string) {
+        try {
+            const user = await this.userService.getUser(uuid)
+
+
+            const absence = await this.prisma.absenceReports.findFirst({
+                where: {
+                    user: {
+                        uuid
+                    },
+                    active: true
+                }
+            })
+
+
+            if (!user.indisposed) {
+                throw new BadRequestException('U bent niet afwezig.')
+            }
+
+            await this.prisma.user.update({
+                where: {
+                    uuid
+                },
+                data: {
+                    indisposed: false
+                }
+            })
+
+            if (!absence) {
+                throw new BadRequestException('No active absence found')
+            }
+
+            return await this.prisma.absenceReports.update({
+                where: {
+                    uuid: absence.uuid
+                },
+                data: {
+                    active: false
                 }
             })
         } catch(e) {

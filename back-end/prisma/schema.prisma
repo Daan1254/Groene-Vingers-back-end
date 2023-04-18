@@ -25,7 +25,39 @@ model User {
   AccessToken    AccessToken[]
   ShoppingCart   ShoppingCart?
   absenceReports AbsenceReports[]
-  pin            String?
+  admin          Boolean          @default(false)
+  appointments   Appointment[]
+}
+
+model Appointment {
+  uuid        String   @id @default(uuid())
+  user        User     @relation(fields: [userUuid], references: [uuid])
+  userUuid    String
+  date        DateTime
+  title       String
+  description String?
+}
+
+model Product {
+  uuid        String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  price       String
+  imageUrl    String?
+  kuinId      String?
+  stock       stock?
+  height_cm   Int?
+  width_cm    Int?
+  depth_cm    Int?
+  weight_gr   Int?
+  createdAt   DateTime @default(now())
+}
+
+model stock {
+  uuid        String  @id @default(uuid())
+  product     Product @relation(fields: [productUuid], references: [uuid])
+  productUuid String  @unique
+  quantity    Int
 }
 
 model AbsenceReports {
@@ -58,4 +90,9 @@ model ProductOnShoppingCart {
   shoppingCartId String
   productId      String
   quantity       Int          @default(1)
+}
+
+model Settings {
+  application       String  @unique
+  categoriesEnabled Boolean @default(true)
 }
