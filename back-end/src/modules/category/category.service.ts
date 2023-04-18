@@ -7,13 +7,4 @@ export class CategoryService {
     constructor(private readonly prisma: PrismaService) {}
 
 
-    async getCategories() {
-        try {
-            return await this.prisma.category.findMany()
-        } catch (e) {
-            Logger.error(e)
-            throw new BadRequestException('Something went wrong')
-        }
-
-    }
 }

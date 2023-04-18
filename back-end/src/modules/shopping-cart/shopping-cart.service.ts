@@ -34,7 +34,7 @@ export class ShoppingCartService {
 
     async addProductToShoppingCart(uuid: string, productId: string) {
         try {
-            const product = await this.productService.getProduct(productId)
+            const product = await this.productService.getKuinProduct(productId)
 
             if (!product) {
                 throw new NotFoundException('Product niet gevonden')
@@ -113,7 +113,7 @@ export class ShoppingCartService {
 
     async removeProductFromShoppingCart(uuid: string, productId: string) {
         try {
-            const kuinProduct = await this.productService.getProduct(productId)
+            const kuinProduct = await this.productService.getKuinProduct(productId)
 
             if (!kuinProduct) {
                 throw new NotFoundException('Product niet gevonden')

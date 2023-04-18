@@ -1,4 +1,5 @@
 import {ApiProperty} from "@nestjs/swagger";
+import {StockDto} from "./stock-dto";
 
 export class ProductDto {
     @ApiProperty()
@@ -11,8 +12,16 @@ export class ProductDto {
     price: string
 
     @ApiProperty()
-    soldOut: boolean
+    description: string
 
     @ApiProperty()
-    active: boolean
+    imageUrl: string
+
+    @ApiProperty()
+    kuinId: number
+
+    @ApiProperty({
+        type: StockDto
+    })
+    stock: StockDto
 }
