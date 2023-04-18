@@ -57,6 +57,7 @@ export class AuthService {
   }
 
   async register(loginDto: LoginDto) {
+    //check if email already exists
     const exists =
       (await this.prisma.user.count({
         where: {
@@ -67,11 +68,13 @@ export class AuthService {
     if (exists) {
       throw new BadRequestException('Dit email is al in gebruik!');
     }
-
+    //------
+    // create user
     await this.prisma.user.create({
       data: {
         email: loginDto.email,
         password: hashSync(loginDto.password, 10),
+        pin: loginDto.pin,
       },
     });
 
