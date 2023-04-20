@@ -1,7 +1,8 @@
-import {Controller, Get, Param, UseGuards} from '@nestjs/common'
+import {Body, Controller, Get, Param, Post, UseGuards} from '@nestjs/common'
 import {ProductService} from "./product.service";
 import {ApiHeaders, ApiTags} from "@nestjs/swagger";
 import {AuthGuard} from "../auth/auth.guard";
+import {OrderKuinProductDto} from "./dto/order-kuin-product.dto";
 
 @ApiTags('Product')
 @Controller('product')
@@ -23,6 +24,12 @@ export class ProductController {
         return await this.productService.getKuinProduct(id)
     }
 
+    @Post('kuin')
+    @UseGuards(AuthGuard)
+    @ApiHeaders([{name: 'auth-token', description: 'Groene vingers API token'}])
+    orderKuinProduct(@Body() body: OrderKuinProductDto[]) {
+        return this.productService.orderKuinProduct(body)
+    }
 
     @Get('')
     async getProducts() {
@@ -33,5 +40,4 @@ export class ProductController {
     async getProduct(@Param('uuid') uuid: string) {
         return await this.productService.getProduct(uuid)
     }
-
 }

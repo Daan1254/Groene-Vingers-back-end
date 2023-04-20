@@ -17,8 +17,10 @@ export class ProductDto {
     @ApiProperty()
     imageUrl: string
 
-    @ApiProperty()
-    kuinId: number
+    @ApiProperty({
+        nullable: true
+    })
+    kuinId?: number
 
     @ApiProperty({
         type: StockDto

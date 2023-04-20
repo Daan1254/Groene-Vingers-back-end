@@ -1,7 +1,9 @@
-import {Injectable, Logger, NotFoundException} from "@nestjs/common";
+import {BadRequestException, Injectable, Logger, NotFoundException} from "@nestjs/common";
 import {PrismaService} from "../../database/prisma.service";
 import {HttpService} from "@nestjs/axios";
 import {KUIN_BASE_URL} from "../../main";
+import {OrderKuinProductDto} from "./dto/order-kuin-product.dto";
+import {KuinOrderDto} from "./dto/kuin-order.dto";
 
 @Injectable()
 export class ProductService {
@@ -62,6 +64,29 @@ export class ProductService {
         } catch(e) {
             Logger.error(e)
             throw new NotFoundException('Product niet gevonden')
+        }
+    }
+
+    async orderKuinProduct(products: OrderKuinProductDto[]) {
+        let orders: KuinOrderDto[] = []
+        try {
+            products.map(product => {
+                let order = this.httpService.post<KuinOrderDto>(`${KUIN_BASE_URL}/orderItem`,{
+                    product_id: product.id,
+                    quantity: product.quantity
+                },{
+                    headers: {
+                        Authorization: `Bearer ${process.env.KUIN_API_KEY}`
+                    }
+                }).subscribe(order => {
+                    orders.push(order.data)
+                })
+            })
+
+            // Update stock
+        } catch(e) {
+            Logger.error(e)
+            throw new BadRequestException('Er is iets fout gegaan bij het bestellen van de producten')
         }
     }
 }
