@@ -74,7 +74,6 @@ export class AuthService {
       data: {
         email: loginDto.email,
         password: hashSync(loginDto.password, 10),
-        pin: loginDto.pin,
       },
     });
 

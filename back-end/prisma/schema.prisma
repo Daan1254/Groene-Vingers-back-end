@@ -39,18 +39,28 @@ model Appointment {
 }
 
 model Product {
-  uuid        String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  price       String
-  imageUrl    String?
-  kuinId      String?
-  stock       stock?
-  height_cm   Int?
-  width_cm    Int?
-  depth_cm    Int?
-  weight_gr   Int?
-  createdAt   DateTime @default(now())
+  uuid         String    @id @default(uuid())
+  name         String    @unique
+  description  String?
+  price        String
+  imageUrl     String?
+  kuinId       Int?
+  stock        stock?
+  height_cm    Int?
+  width_cm     Int?
+  depth_cm     Int?
+  weight_gr    Int?
+  createdAt    DateTime  @default(now())
+  barcode      String?   @unique
+  categoryUuid String?
+  Category     Category? @relation(fields: [categoryUuid], references: [uuid])
+}
+
+model Category {
+  uuid        String    @id @default(uuid())
+  name        String
+  description String
+  products    Product[]
 }
 
 model stock {
