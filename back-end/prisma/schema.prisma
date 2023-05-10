@@ -38,29 +38,26 @@ model Appointment {
   description String?
 }
 
-
-
 model Product {
-    uuid         String              @id @default(uuid())
-    name         String              @unique
-    description  String?
-    price        String
-    imageUrl     String?
-    kuinId       String?
-    stock        stock?
-    height_cm    Int?
-    width_cm     Int?
-    depth_cm     Int?
-    weight_gr    Int?
-    createdAt    DateTime            @default(now())
+  uuid        String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  price       String
+  imageUrl    String?
+  kuinId      Int?
+  stock       stock?
+  height_cm   Int?
+  width_cm    Int?
+  depth_cm    Int?
+  weight_gr   Int?
+  createdAt   DateTime @default(now())
 }
 
-
 model stock {
-    uuid String              @id @default(uuid())
-    product Product           @relation(fields: [productUuid], references: [uuid])
-    productUuid String @unique
-    quantity Int
+  uuid        String  @id @default(uuid())
+  product     Product @relation(fields: [productUuid], references: [uuid])
+  productUuid String  @unique
+  quantity    Int
 }
 
 model AbsenceReports {

@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiHeaders, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
-import { OrderKuinProductDto } from './dto/order-kuin-product.dto';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @ApiTags('Product')
 @Controller('product')
@@ -26,7 +26,7 @@ export class ProductController {
   @Post('kuin')
   @UseGuards(AuthGuard)
   @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
-  orderKuinProduct(@Body() body: OrderKuinProductDto) {
+  orderKuinProduct(@Body() body: CreateProductDto) {
     return this.productService.orderKuinProduct(body);
   }
 

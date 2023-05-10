@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { StockDto } from './stock-dto';
 
-export class OrderKuinProductDto {
-  @ApiProperty()
-  id: number;
+export class CreateProductDto {
   @ApiProperty()
   name: string;
   @ApiProperty()
@@ -13,6 +12,8 @@ export class OrderKuinProductDto {
   image: string;
   @ApiProperty()
   color: string;
+  @ApiProperty()
+  kuinId: number;
   @ApiProperty()
   height_cm: number;
   @ApiProperty()
