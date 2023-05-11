@@ -3,25 +3,26 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { HttpService } from '@nestjs/axios';
 import { KUIN_BASE_URL } from '../../main';
 import { CreateProductDto } from './dto/create-product.dto';
 import { KuinOrderDto } from './dto/kuin-order.dto';
-import { catchError } from 'rxjs';
-import { ProductDto } from './dto/product.dto';
 import { Product } from '@prisma/client';
+import { OrderService } from '../order/order.service';
+import { UserDto } from '../auth/dto/user.dto';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly httpService: HttpService,
+    private readonly orderService: OrderService,
   ) {}
 
   async getKuinProducts() {
+    await this.orderService.refreshKuinOrders();
     try {
       const response = await this.httpService
         .get(`${KUIN_BASE_URL}/product`, {
@@ -54,6 +55,7 @@ export class ProductService {
   }
 
   async getProducts() {
+    await this.orderService.refreshKuinOrders();
     try {
       return await this.prisma.product.findMany({
         include: {
@@ -66,6 +68,7 @@ export class ProductService {
   }
 
   async getProduct(uuid: string) {
+    await this.orderService.refreshKuinOrders();
     try {
       return await this.prisma.product.findUnique({
         where: {
@@ -81,15 +84,15 @@ export class ProductService {
     }
   }
 
-  async orderKuinProduct(product: CreateProductDto) {
-    console.log(product.kuinId, product.quantity);
+  async orderKuinProduct(body: CreateProductDto, user: UserDto) {
+    await this.orderService.refreshKuinOrders();
     try {
       const order = await this.httpService
         .post<KuinOrderDto>(
           `${KUIN_BASE_URL}/orderItem`,
           {
-            product_id: product.kuinId,
-            quantity: product.quantity,
+            product_id: body.kuinId,
+            quantity: body.quantity,
           },
           {
             headers: {
@@ -100,16 +103,58 @@ export class ProductService {
         )
         .toPromise();
 
-      const newProduct = await this.createProduct(product);
+      const doesProductExist: boolean = await this.doesProductExist(
+        body.kuinId,
+      );
+
+      let product = null;
+
+      if (!doesProductExist) {
+        product = await this.createProduct(body);
+      } else {
+        product = await this.prisma.product.findFirst({
+          where: {
+            kuinId: body.kuinId,
+          },
+          include: {
+            stock: true,
+          },
+        });
+      }
+
+      return await this.orderService.createOrder(
+        {
+          kuinId: body.kuinId,
+          quantity: body.quantity,
+          productUuid: product.uuid,
+          orderId: order.data.order_id,
+        },
+        user,
+      );
     } catch (e) {
       Logger.error(e);
-      throw new UnprocessableEntityException(
+      throw new BadRequestException(
         'Er is iets fout gegaan bij het bestellen van de producten',
       );
     }
   }
 
+  async doesProductExist(kuinId: number) {
+    try {
+      const product = await this.prisma.product.count({
+        where: {
+          kuinId,
+        },
+      });
+
+      return product > 0;
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
   private async createProduct(product: CreateProductDto): Promise<Product> {
+    await this.orderService.refreshKuinOrders();
     try {
       return await this.prisma.product.create({
         data: {
@@ -123,9 +168,13 @@ export class ProductService {
           },
           kuinId: product.kuinId,
         },
+        include: {
+          stock: true,
+        },
       });
     } catch (e) {
       console.error(e);
+      Logger.error(e);
     }
   }
 }

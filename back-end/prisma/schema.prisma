@@ -27,6 +27,7 @@ model User {
   absenceReports AbsenceReports[]
   admin          Boolean          @default(false)
   appointments   Appointment[]
+  Order          Order[]
 }
 
 model Appointment {
@@ -42,7 +43,7 @@ model Product {
   uuid        String   @id @default(uuid())
   name        String   @unique
   description String?
-  price       String
+  price       Int
   imageUrl    String?
   kuinId      Int?
   stock       stock?
@@ -51,6 +52,25 @@ model Product {
   depth_cm    Int?
   weight_gr   Int?
   createdAt   DateTime @default(now())
+  Order       Order[]
+}
+
+model Order {
+  uuid        String   @id @default(uuid())
+  user        User     @relation(fields: [userUuid], references: [uuid])
+  userUuid    String
+  product     Product? @relation(fields: [productUuid], references: [uuid])
+  productUuid String?
+  kuinId      Int?
+  quantity    Int
+  orderId     Int?     @unique
+  status      Status   @default(PROCESSING)
+  createdAt   DateTime @default(now())
+}
+
+enum Status {
+  PROCESSING
+  COMPLETED
 }
 
 model stock {
