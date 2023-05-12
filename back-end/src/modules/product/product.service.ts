@@ -3,12 +3,14 @@ import { PrismaService } from '../../database/prisma.service';
 import { HttpService } from '@nestjs/axios';
 import { KUIN_BASE_URL } from '../../main';
 import { ProductDto } from './dto/product.dto';
+import { ProductGateway } from './product.gateway';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly httpService: HttpService,
+    private readonly productGateway: ProductGateway,
   ) {}
 
   async getKuinProducts() {
@@ -86,6 +88,7 @@ export class ProductService {
     }
   }
 
+  // create product
   async createProduct(productDto: ProductDto) {
     try {
       const createdProduct = await this.prisma.product.create({
@@ -111,6 +114,28 @@ export class ProductService {
       return createdProduct;
     } catch (e) {
       Logger.error(e);
+    }
+  }
+
+  // get product on barcode
+  async getProductByBarcode(barcode: string) {
+    try {
+      const product = await this.prisma.product.findUnique({
+        where: {
+          barcode,
+        },
+        include: {
+          stock: true,
+        },
+      });
+
+      // Send product to client
+      this.productGateway.sendProduct(product);
+
+      return product;
+    } catch (e) {
+      Logger.error(e);
+      throw new NotFoundException('Product niet gevonden');
     }
   }
 }

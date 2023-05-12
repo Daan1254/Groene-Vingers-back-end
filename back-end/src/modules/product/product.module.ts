@@ -1,13 +1,14 @@
-import { Module } from "@nestjs/common";
-import {ProductController} from "./product.controller";
-import {ProductService} from "./product.service";
-import {HttpModule} from "@nestjs/axios";
-import {PrismaService} from "../../database/prisma.service";
+import { Module } from '@nestjs/common';
+import { ProductController } from './product.controller';
+import { ProductService } from './product.service';
+import { HttpModule } from '@nestjs/axios';
+import { PrismaService } from '../../database/prisma.service';
+import { ProductGateway } from './product.gateway';
 
 @Module({
-    controllers: [ProductController],
-    providers: [ProductService, PrismaService],
-    imports: [HttpModule],
-    exports: [ProductService]
+  controllers: [ProductController],
+  providers: [ProductService, PrismaService, ProductGateway],
+  imports: [HttpModule],
+  exports: [ProductService],
 })
-export class ProductModule{}
+export class ProductModule {}

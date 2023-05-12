@@ -38,6 +38,12 @@ export class ProductController {
     return await this.productService.getProduct(uuid);
   }
 
+  @Get('barcode/:barcode')
+  async getProductByBarcode(@Param('barcode') barcode: string) {
+    console.log(barcode);
+    return await this.productService.getProductByBarcode(barcode);
+  }
+
   @Post('create')
   async createProduct(@Body() productDto: ProductDto) {
     return await this.productService.createProduct(productDto);
