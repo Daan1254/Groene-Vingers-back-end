@@ -64,6 +64,7 @@ model Order {
   kuinId      Int?
   quantity    Int
   orderId     Int?     @unique
+  price       Int
   status      Status   @default(PROCESSING)
   createdAt   DateTime @default(now())
 }

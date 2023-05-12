@@ -27,8 +27,6 @@ export class OrderService {
 
       const data = response.data;
 
-      console.log(data);
-
       data.map(async (data) => {
         const order = await this.prisma.order
           .findUnique({
@@ -68,6 +66,11 @@ export class OrderService {
         stock: true,
       },
     });
+
+    if (!existingProduct) {
+      return;
+    }
+
     await this.prisma.stock.update({
       where: {
         productUuid: existingProduct.uuid,
@@ -97,6 +100,27 @@ export class OrderService {
           },
           orderId: body.orderId,
           quantity: body.quantity,
+        },
+        include: {
+          product: true,
+        },
+      });
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
+  async getOrders() {
+    await this.refreshKuinOrders();
+    try {
+      return await this.prisma.order.findMany({
+        where: {
+          kuinId: {
+            not: null,
+          },
+          orderId: {
+            not: null,
+          },
         },
         include: {
           product: true,
