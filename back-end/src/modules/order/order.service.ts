@@ -100,6 +100,7 @@ export class OrderService {
           },
           orderId: body.orderId,
           quantity: body.quantity,
+          price: 200
         },
         include: {
           product: true,
