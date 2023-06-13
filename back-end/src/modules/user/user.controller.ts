@@ -5,9 +5,11 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBody, ApiHeaders, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('User')
@@ -26,5 +28,15 @@ export class UserController {
   @ApiBody({ type: CreateUserDto })
   public async createUser(@Body() userDto: CreateUserDto) {
     return this.userService.createUser(userDto);
+  }
+
+  @Put(':uuid')
+  @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
+  @ApiBody({ type: UpdateUserDto })
+  public async updateUser(
+    @Body() userDto: UpdateUserDto,
+    @Param('uuid') uuid: string,
+  ) {
+    return this.userService.updateUser(userDto, uuid);
   }
 }

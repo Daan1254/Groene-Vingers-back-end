@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiHeaders, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '../auth/auth.guard';
-import { ProductDto } from './dto/product.dto';
+import { AuthGuard, RequestWithAuth } from '../auth/auth.guard';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @ApiTags('Product')
 @Controller('product')
@@ -33,6 +41,16 @@ export class ProductController {
     return await this.productService.getProductsByCategory(uuid);
   }
 
+  @Post('kuin')
+  @UseGuards(AuthGuard)
+  @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
+  orderKuinProduct(
+    @Body() body: CreateProductDto,
+    @Req() request: RequestWithAuth,
+  ) {
+    return this.productService.orderKuinProduct(body, request.user);
+  }
+
   @Get(':uuid')
   async getProduct(@Param('uuid') uuid: string) {
     return await this.productService.getProduct(uuid);
@@ -44,8 +62,9 @@ export class ProductController {
     return await this.productService.getProductByBarcode(barcode);
   }
 
-  @Post('create')
-  async createProduct(@Body() productDto: ProductDto) {
-    return await this.productService.createProduct(productDto);
-  }
+  // @Post('create')
+  // async createProduct(@Body() productDto: ProductDto) {
+  //   return await this.productService.createProduct(productDto);
+  // }
+  // create product if needed
 }

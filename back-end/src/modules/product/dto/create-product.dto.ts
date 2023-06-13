@@ -1,48 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { StockDto } from './stock-dto';
 
-export class ProductDto {
-  @ApiProperty()
-  uuid: string;
-
+export class CreateProductDto {
   @ApiProperty()
   name: string;
-
-  @ApiProperty()
-  price: string;
-
   @ApiProperty()
   description: string;
-
   @ApiProperty()
-  imageUrl: string;
-
-  @ApiProperty({
-    nullable: true,
-  })
+  price: number;
+  @ApiProperty()
+  image: string;
+  @ApiProperty()
+  color: string;
   @ApiProperty()
   kuinId: number;
-
   @ApiProperty()
   height_cm: number;
-
   @ApiProperty()
   width_cm: number;
-
   @ApiProperty()
   depth_cm: number;
-
   @ApiProperty()
   weight_gr: number;
-
-  @ApiProperty({
-    type: StockDto,
-  })
-  stock: StockDto;
-
   @ApiProperty()
-  categoryUuid: string;
-
+  quantity: number;
   @ApiProperty()
-  barcode: string;
+  created_at: Date;
+  @ApiProperty()
+  updated_at: Date;
 }
