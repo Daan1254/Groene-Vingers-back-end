@@ -5,6 +5,7 @@ export enum OrderStatus {
   PROCESSING = 'processing',
   COMPLETED = 'completed',
 }
+
 export class OrderDto {
   @ApiProperty()
   uuid: string;

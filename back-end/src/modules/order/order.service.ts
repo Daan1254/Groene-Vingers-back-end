@@ -57,32 +57,6 @@ export class OrderService {
     }
   }
 
-  private async updateStock(order: Order) {
-    const existingProduct = await this.prisma.product.findFirst({
-      where: {
-        kuinId: order.kuinId,
-      },
-      include: {
-        stock: true,
-      },
-    });
-
-    if (!existingProduct) {
-      return;
-    }
-
-    await this.prisma.stock.update({
-      where: {
-        productUuid: existingProduct.uuid,
-      },
-      data: {
-        quantity: {
-          increment: order.quantity,
-        },
-      },
-    });
-  }
-
   public async createOrder(body: CreateOrderDto, user: UserDto) {
     try {
       return await this.prisma.order.create({
@@ -100,7 +74,7 @@ export class OrderService {
           },
           orderId: body.orderId,
           quantity: body.quantity,
-          price: 200
+          price: 200,
         },
         include: {
           product: true,
@@ -130,5 +104,31 @@ export class OrderService {
     } catch (e) {
       Logger.error(e);
     }
+  }
+
+  private async updateStock(order: Order) {
+    const existingProduct = await this.prisma.product.findFirst({
+      where: {
+        kuinId: order.kuinId,
+      },
+      include: {
+        stock: true,
+      },
+    });
+
+    if (!existingProduct) {
+      return;
+    }
+
+    await this.prisma.stock.update({
+      where: {
+        productUuid: existingProduct.uuid,
+      },
+      data: {
+        quantity: {
+          increment: order.quantity,
+        },
+      },
+    });
   }
 }
