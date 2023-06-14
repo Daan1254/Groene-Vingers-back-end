@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UserDto } from '../auth/dto/user.dto';
@@ -39,13 +39,14 @@ export class OrderService {
           });
 
         if (order) {
-          if (data.status === 'completed') {
+          if (data.status === 'completed' && !order.quanityUpdated) {
             const order = await this.prisma.order.update({
               where: {
                 orderId: data.id,
               },
               data: {
                 status: Status.COMPLETED,
+                quanityUpdated: true,
               },
             });
             await this.updateStock(order);
@@ -58,32 +59,42 @@ export class OrderService {
   }
 
   private async updateStock(order: Order) {
-    const existingProduct = await this.prisma.product.findFirst({
-      where: {
-        kuinId: order.kuinId,
-      },
-      include: {
-        stock: true,
-      },
-    });
-
-    if (!existingProduct) {
-      return;
-    }
-
-    await this.prisma.stock.update({
-      where: {
-        productUuid: existingProduct.uuid,
-      },
-      data: {
-        quantity: {
-          increment: order.quantity,
+    console.log(order);
+    try {
+      const existingProduct = await this.prisma.product.findFirst({
+        where: {
+          kuinId: order.kuinId,
         },
-      },
-    });
+        include: {
+          stock: true,
+        },
+      });
+
+      console.log(existingProduct);
+
+      if (!existingProduct) {
+        throw new NotFoundException(
+          `Unable to find product with kuinId ${order.kuinId}`,
+        );
+      }
+
+      await this.prisma.stock.update({
+        where: {
+          productUuid: existingProduct?.uuid,
+        },
+        data: {
+          quantity: {
+            increment: order?.quantity,
+          },
+        },
+      });
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 
   public async createOrder(body: CreateOrderDto, user: UserDto) {
+    console.log(body.pricePerUnit);
     try {
       return await this.prisma.order.create({
         data: {
@@ -100,6 +111,7 @@ export class OrderService {
           },
           orderId: body.orderId,
           quantity: body.quantity,
+          price: body.pricePerUnit * body.quantity,
         },
         include: {
           product: true,

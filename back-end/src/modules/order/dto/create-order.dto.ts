@@ -16,6 +16,11 @@ export class CreateOrderDto {
   })
   orderId?: number;
 
+  @ApiProperty({
+    nullable: false,
+  })
+  pricePerUnit: number;
+
   @ApiProperty()
   quantity: number;
 }

@@ -85,6 +85,7 @@ export class ProductService {
   }
 
   async orderKuinProduct(body: CreateProductDto, user: UserDto) {
+    console.log(body);
     await this.orderService.refreshKuinOrders();
     try {
       const order = await this.httpService
@@ -107,7 +108,7 @@ export class ProductService {
         body.kuinId,
       );
 
-      let product = null;
+      let product: Product | null = null;
 
       if (!doesProductExist) {
         product = await this.createProduct(body);
@@ -128,6 +129,7 @@ export class ProductService {
           quantity: body.quantity,
           productUuid: product.uuid,
           orderId: order.data.order_id,
+          pricePerUnit: product.price,
         },
         user,
       );
