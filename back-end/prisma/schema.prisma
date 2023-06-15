@@ -66,17 +66,18 @@ model Category {
 }
 
 model Order {
-  uuid        String   @id @default(uuid())
-  user        User     @relation(fields: [userUuid], references: [uuid])
-  userUuid    String
-  product     Product? @relation(fields: [productUuid], references: [uuid])
-  productUuid String?
-  kuinId      Int?
-  quantity    Int
-  orderId     Int?     @unique
-  price       Int
-  status      Status   @default(PROCESSING)
-  createdAt   DateTime @default(now())
+  uuid           String   @id @default(uuid())
+  user           User     @relation(fields: [userUuid], references: [uuid])
+  userUuid       String
+  product        Product? @relation(fields: [productUuid], references: [uuid])
+  productUuid    String?
+  kuinId         Int?
+  quantity       Int
+  orderId        Int?     @unique
+  price          Int
+  status         Status   @default(PROCESSING)
+  quanityUpdated Boolean  @default(false)
+  createdAt      DateTime @default(now())
 }
 
 enum Status {

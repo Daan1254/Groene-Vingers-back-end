@@ -44,11 +44,11 @@ export class ProductController {
   @Post('kuin')
   @UseGuards(AuthGuard)
   @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
-  orderKuinProduct(
+  async orderKuinProduct(
     @Body() body: CreateProductDto,
     @Req() request: RequestWithAuth,
   ) {
-    return this.productService.orderKuinProduct(body, request.user);
+    return await this.productService.orderKuinProduct(body, request.user);
   }
 
   @Get(':uuid')
