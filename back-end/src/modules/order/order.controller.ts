@@ -17,7 +17,7 @@ export class OrderController {
   }
 
   //   create order
-  @Post('CreateOrder')
+  @Post('')
   @UseGuards(AuthGuard)
   @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
   async createOrder(@Body() body: CreateOrderDto, @Req() req) {

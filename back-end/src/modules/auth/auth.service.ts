@@ -46,13 +46,20 @@ export class AuthService {
         throw new UnauthorizedException('Token not found');
       }
 
-      if (accessToken.expiresAt < new Date()) {
+      // datum op tijd en niet op dagen
+      const now = new Date();
+      const nowTime = now.getHours() * 60 + now.getMinutes();
+      const expiredTime =
+        accessToken.expiresAt.getHours() * 60 +
+        accessToken.expiresAt.getMinutes();
+
+      if (nowTime > expiredTime) {
         throw new UnauthorizedException('Token expired');
       }
 
       return accessToken.user;
     } catch (e) {
-      throw new UnauthorizedException('Token not found');
+      throw new UnauthorizedException(e.message);
     }
   }
 
