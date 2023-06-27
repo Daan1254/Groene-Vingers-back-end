@@ -6,7 +6,8 @@ import {
 import { PrismaService } from '../../database/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { hashSync } from 'bcrypt'
+import { hashSync } from 'bcrypt';
+import { Role } from './dto/role.dto';
 
 @Injectable()
 export class UserService {
@@ -43,7 +44,7 @@ export class UserService {
   }
 
   async updateUser(userDto: UpdateUserDto, uuid: string) {
-    let hashedPassword = null
+    let hashedPassword = null;
     if (userDto.password) {
       hashedPassword = hashSync(userDto.password, 10);
     }
@@ -80,5 +81,11 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async getRoles() {
+    return {
+      roles: [Role.ADMIN, Role.CUSTOMER, Role.EMPLOYEE],
+    };
   }
 }

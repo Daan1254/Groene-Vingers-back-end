@@ -6,11 +6,13 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBody, ApiHeaders, ApiParam, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('User')
 @Controller('user')
@@ -23,6 +25,13 @@ export class UserController {
     return this.userService.getUser(uuid);
   }
 
+  @Get('roles/get')
+  @UseGuards(AuthGuard)
+  @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
+  public async getRoles() {
+    return this.userService.getRoles();
+  }
+
   @Post()
   @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
   @ApiBody({ type: CreateUserDto })
@@ -33,7 +42,10 @@ export class UserController {
   @Put(':uuid')
   @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
   @ApiBody({ type: UpdateUserDto })
-  public async updateUser(@Body() userDto: UpdateUserDto, @Param('uuid') uuid: string) {
+  public async updateUser(
+    @Body() userDto: UpdateUserDto,
+    @Param('uuid') uuid: string,
+  ) {
     return this.userService.updateUser(userDto, uuid);
   }
 }
