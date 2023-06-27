@@ -66,7 +66,7 @@ model Order {
   orderId        Int?     @unique
   price          Int
   status         Status   @default(PROCESSING)
-  quanityUpdated Boolean  @default(false)
+  quantityUpdated Boolean  @default(false)
   createdAt      DateTime @default(now())
 }
 
