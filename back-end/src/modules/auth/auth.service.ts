@@ -8,7 +8,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { UserService } from '../user/user.service';
 import * as crypto from 'crypto';
 import { LoginDto } from './dto/login.dto';
-import { hashSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -24,9 +24,9 @@ export class AuthService {
       throw new Error('User not found');
     }
 
-    // if (!compareSync(body.password, user.password)) {
-    //   throw new BadRequestException('WRONG_PASSWORD');
-    // }
+    if (!compareSync(body.password, user.password)) {
+      throw new BadRequestException('WRONG_PASSWORD');
+    }
 
     return { token: await this.generateToken(user.uuid) };
   }

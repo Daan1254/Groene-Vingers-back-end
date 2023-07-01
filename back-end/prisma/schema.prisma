@@ -17,7 +17,8 @@ enum AbsenceType {
 }
 
 enum Role {
-  EMPLOYEE
+  WEB_EMPLOYEE
+  IN_STORE_EMPLOYEE
   ADMIN
   CUSTOMER
 }
