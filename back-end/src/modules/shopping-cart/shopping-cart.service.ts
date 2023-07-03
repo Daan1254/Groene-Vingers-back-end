@@ -1,12 +1,42 @@
-import {BadRequestException, Injectable, Logger, NotFoundException} from "@nestjs/common";
-import {PrismaService} from "../../database/prisma.service";
-import {ProductService} from "../product/product.service";
+import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../../database/prisma.service";
+import { ProductService } from "../product/product.service";
+import { InjectStripe  } from 'nestjs-stripe';
+import Stripe from 'stripe';
+
 
 @Injectable()
 export class ShoppingCartService {
-    constructor(private readonly prisma: PrismaService, private readonly productService: ProductService) {
+    constructor(
+        private readonly prisma: PrismaService, 
+        private readonly productService: ProductService,
+        @InjectStripe() private readonly stripeClient: Stripe,
+      ) {}
 
-    }
+
+      async createPayment(price: number) {
+        const session = await this.stripeClient.checkout.sessions.create(
+          {
+            line_items: [
+              {
+                price_data: {
+                  currency: 'eur',
+                  unit_amount: price,
+                },
+                quantity: 1,
+              },
+            ],
+            mode: 'payment',
+            success_url: 'https://www.youtube.com',
+            cancel_url: 'https://www.google.com',
+          },
+          {
+            apiKey: process.env.STRIPE_API_KEY,
+          },
+        );
+    
+        return session;
+      }
 
     async getShoppingCartFromUser(uuid: any) {
         try {

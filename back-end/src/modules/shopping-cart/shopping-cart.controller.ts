@@ -21,6 +21,12 @@ export class ShoppingCartController {
         return await this.shoppingCartService.addProductToShoppingCart(req.user.uuid, productId)
     }
 
+    @Post('order')
+    @ApiParam({name: 'price', description: 'Amount (price)'})
+    async chargeCustomer(@Param('price') price: number) {
+        return this.shoppingCartService.createPayment(price);
+    }
+
     @Delete('remove/:productId')
     @UseGuards(AuthGuard)
     @ApiHeaders([{name: 'auth-token', description: 'Groene vingers API token'}])
