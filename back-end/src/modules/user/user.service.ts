@@ -1,12 +1,15 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { hashSync } from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import { Role } from '@prisma/client';
+import { UserDto } from '../auth/dto/user.dto';
+import { CreateEditUserDto } from './dto/create-edit-user.dto';
 
 @Injectable()
 export class UserService {
@@ -26,47 +29,46 @@ export class UserService {
     return user;
   }
 
-  async createUser(userDto: CreateUserDto) {
-    const hashedPassword = hashSync(userDto.password, 10);
-    const user = await this.prisma.user.create({
+  async createUser(body: CreateEditUserDto, user: UserDto) {
+    const hashedPassword = bcrypt.hashSync(body.password, 10);
+
+    if (body.admin && !user.admin) {
+      throw new UnauthorizedException('You are not authorized to do this');
+    }
+
+    const newUser = await this.prisma.user.create({
       data: {
-        ...userDto,
+        ...body,
         password: hashedPassword,
-        // const user = await this.prisma.user.create({
-        //   data: {
-        //     ...userDto,
-        //     password: userDto.password,
       },
     });
 
-    if (!user) {
+    if (!newUser) {
       throw new BadRequestException('Something went wrong while creating user');
     }
 
-    return user;
+    return newUser;
   }
 
-  async updateUser(userDto: UpdateUserDto, uuid: string) {
-    let hashedPassword = null;
-    if (userDto.password) {
-      hashedPassword = hashSync(userDto.password, 10);
+  async updateUser(body: CreateEditUserDto, user: UserDto) {
+    if (body.admin && !user.admin) {
+      throw new UnauthorizedException('You are not authorized to do this');
     }
-    const user = await this.prisma.user.update({
+
+    const updatedUser = await this.prisma.user.update({
       where: {
-        uuid: uuid,
+        uuid: body.uuid,
       },
       data: {
-        username: userDto.username,
-        email: userDto.email,
-        password: hashedPassword,
+        ...body,
       },
     });
 
-    if (!user) {
-      throw new BadRequestException('Something went wrong while creating user');
+    if (!updatedUser) {
+      throw new BadRequestException('Something went wrong while updating user');
     }
 
-    return user;
+    return updatedUser;
   }
 
   async getUserByEmail(email: string) {
@@ -84,5 +86,49 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async getRoles() {
+    return {
+      roles: [
+        Role.ADMIN,
+        Role.WEB_EMPLOYEE,
+        Role.IN_STORE_EMPLOYEE,
+        Role.CUSTOMER,
+      ],
+    };
+  }
+
+  async getAllUsers(user: UserDto) {
+    if (!user.admin) {
+      throw new UnauthorizedException('You are not authorized to do this');
+    }
+    return this.prisma.user.findMany();
+  }
+
+  async deleteUser(uuid: string, user: UserDto) {
+    try {
+      if (!user.admin) {
+        throw new UnauthorizedException('You are not authorized to do this');
+      }
+
+      const deletedUser = await this.prisma.user.findUnique({
+        where: {
+          uuid,
+        },
+      });
+
+      if (deletedUser.admin) {
+        throw new UnauthorizedException('You are not authorized to do this');
+      }
+
+      return this.prisma.user.delete({
+        where: {
+          uuid: uuid,
+        },
+      });
+    } catch (e) {
+      Logger.error(e);
+    }
   }
 }

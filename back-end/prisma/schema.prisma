@@ -16,6 +16,13 @@ enum AbsenceType {
   OTHER
 }
 
+enum Role {
+  WEB_EMPLOYEE
+  IN_STORE_EMPLOYEE
+  ADMIN
+  CUSTOMER
+}
+
 model User {
   uuid           String           @id @default(uuid())
   email          String           @unique
@@ -25,6 +32,7 @@ model User {
   AccessToken    AccessToken[]
   ShoppingCart   ShoppingCart?
   absenceReports AbsenceReports[]
+  role           Role             @default(CUSTOMER)
   admin          Boolean          @default(false)
   appointments   Appointment[]
   Order          Order[]
@@ -66,18 +74,18 @@ model Category {
 }
 
 model Order {
-  uuid           String   @id @default(uuid())
-  user           User     @relation(fields: [userUuid], references: [uuid])
-  userUuid       String
-  product        Product? @relation(fields: [productUuid], references: [uuid])
-  productUuid    String?
-  kuinId         Int?
-  quantity       Int
-  orderId        Int?     @unique @default(autoincrement())
-  price          Int
-  status         Status   @default(PROCESSING)
-  quanityUpdated Boolean  @default(false)
-  createdAt      DateTime @default(now())
+  uuid            String   @id @default(uuid())
+  user            User     @relation(fields: [userUuid], references: [uuid])
+  userUuid        String
+  product         Product? @relation(fields: [productUuid], references: [uuid])
+  productUuid     String?
+  kuinId          Int?
+  quantity        Int
+  orderId         Int?     @unique @default(autoincrement())
+  price           Int
+  status          Status   @default(PROCESSING)
+  quantityUpdated Boolean  @default(false)
+  createdAt       DateTime @default(now())
 }
 
 enum Status {

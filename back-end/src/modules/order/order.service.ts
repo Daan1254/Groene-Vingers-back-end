@@ -40,14 +40,14 @@ export class OrderService {
           });
 
         if (order) {
-          if (data.status === 'completed' && !order.quanityUpdated) {
+          if (data.status === 'completed' && !order.quantityUpdated) {
             const order = await this.prisma.order.update({
               where: {
                 orderId: data.id,
               },
               data: {
                 status: Status.COMPLETED,
-                quanityUpdated: true,
+                quantityUpdated: true,
               },
             });
             await this.updateStock(order);

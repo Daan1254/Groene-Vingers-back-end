@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { UserService } from '../user/user.service';
-import { hashSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcrypt';
 import * as crypto from 'crypto';
 import { LoginDto } from './dto/login.dto';
 
@@ -24,9 +24,9 @@ export class AuthService {
       throw new Error('User not found');
     }
 
-    // if (!compareSync(body.password, user.password)) { -- stond uitgechecked in merge conflict
-    //   throw new BadRequestException('WRONG_PASSWORD');
-    // }
+    if (!compareSync(body.password, user.password)) {
+      throw new BadRequestException('WRONG_PASSWORD');
+    }
 
     return { token: await this.generateToken(user.uuid) };
   }
