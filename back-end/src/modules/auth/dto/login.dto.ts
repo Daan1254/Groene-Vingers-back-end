@@ -6,6 +6,4 @@ export class LoginDto {
 
   @ApiProperty()
   password: string;
-  @ApiProperty()
-  pin: string;
 }
