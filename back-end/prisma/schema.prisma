@@ -73,7 +73,7 @@ model Order {
   productUuid    String?
   kuinId         Int?
   quantity       Int
-  orderId        Int?     @unique
+  orderId        Int?     @unique @default(autoincrement())
   price          Int
   status         Status   @default(PROCESSING)
   quanityUpdated Boolean  @default(false)
@@ -83,6 +83,7 @@ model Order {
 enum Status {
   PROCESSING
   COMPLETED
+  CANCELED
 }
 
 model stock {

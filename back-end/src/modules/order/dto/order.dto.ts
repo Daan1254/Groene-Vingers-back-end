@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProductDto } from '../../product/dto/product.dto';
+import { Status } from '@prisma/client';
 
 export enum OrderStatus {
   PROCESSING = 'processing',
   COMPLETED = 'completed',
+  CANCELED = 'canceled',
 }
 
 export class OrderDto {
@@ -11,9 +13,9 @@ export class OrderDto {
   uuid: string;
 
   @ApiProperty({
-    enum: OrderStatus,
+    enum: Status,
   })
-  status: OrderStatus;
+  status: Status;
 
   @ApiProperty({
     nullable: true,

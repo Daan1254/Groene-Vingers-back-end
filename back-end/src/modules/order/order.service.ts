@@ -7,6 +7,7 @@ import { KUIN_BASE_URL } from '../../main';
 import * as process from 'process';
 import { KuinOrderDto } from '../product/dto/kuin-order.dto';
 import { Order, Status } from '@prisma/client';
+import { OrderDto } from './dto/order.dto';
 
 @Injectable()
 export class OrderService {
@@ -103,6 +104,31 @@ export class OrderService {
           product: true,
         },
       });
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
+  //  update order status
+  async updateOrder(body: OrderDto, user: UserDto) {
+    try {
+      const order = await this.prisma.order.update({
+        where: {
+          uuid: body.uuid,
+        },
+        data: {
+          status: body.status,
+        },
+        include: {
+          product: true,
+        },
+      });
+
+      if (order.status === Status.COMPLETED) {
+        await this.updateStock(order);
+      }
+
+      return order;
     } catch (e) {
       Logger.error(e);
     }
