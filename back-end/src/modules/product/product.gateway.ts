@@ -1,4 +1,3 @@
-// product.gateway.ts
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
