@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { UserService } from '../user/user.service';
+import { compareSync, hashSync } from 'bcrypt';
 import * as crypto from 'crypto';
 import { LoginDto } from './dto/login.dto';
-import { compareSync, hashSync } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -46,14 +46,45 @@ export class AuthService {
         throw new UnauthorizedException('Token not found');
       }
 
-      if (accessToken.expiresAt < new Date()) {
+      // datum op tijd en niet op dagen
+      const now = new Date();
+      const nowTime = now.getHours() * 60 + now.getMinutes();
+      const expiredTime =
+        accessToken.expiresAt.getHours() * 60 +
+        accessToken.expiresAt.getMinutes();
+
+      if (nowTime > expiredTime) {
         throw new UnauthorizedException('Token expired');
       }
 
       return accessToken.user;
     } catch (e) {
-      throw new UnauthorizedException('Token not found');
+      throw new UnauthorizedException(e.message);
     }
+  }
+
+  async register(loginDto: LoginDto) {
+    //check if email already exists
+    const exists =
+      (await this.prisma.user.count({
+        where: {
+          email: loginDto.email,
+        },
+      })) > 0;
+
+    if (exists) {
+      throw new BadRequestException('Dit email is al in gebruik!');
+    }
+    //------
+    // create user
+    await this.prisma.user.create({
+      data: {
+        email: loginDto.email,
+        password: hashSync(loginDto.password, 10),
+      },
+    });
+
+    return 'ok';
   }
 
   private async generateToken(uuid: string) {
@@ -80,27 +111,5 @@ export class AuthService {
     });
 
     return token.token;
-  }
-
-  async register(loginDto: LoginDto) {
-    const exists =
-      (await this.prisma.user.count({
-        where: {
-          email: loginDto.email,
-        },
-      })) > 0;
-
-    if (exists) {
-      throw new BadRequestException('Dit email is al in gebruik!');
-    }
-
-    await this.prisma.user.create({
-      data: {
-        email: loginDto.email,
-        password: hashSync(loginDto.password, 10),
-      },
-    });
-
-    return 'ok';
   }
 }

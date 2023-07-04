@@ -4,6 +4,10 @@ export class CreateOrderDto {
   @ApiProperty({
     nullable: true,
   })
+  uuid?: string;
+  @ApiProperty({
+    nullable: true,
+  })
   productUuid?: string;
 
   @ApiProperty({

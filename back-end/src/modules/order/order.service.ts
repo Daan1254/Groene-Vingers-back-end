@@ -7,6 +7,7 @@ import { KUIN_BASE_URL } from '../../main';
 import * as process from 'process';
 import { KuinOrderDto } from '../product/dto/kuin-order.dto';
 import { Order, Status } from '@prisma/client';
+import { OrderDto } from './dto/order.dto';
 
 @Injectable()
 export class OrderService {
@@ -58,41 +59,6 @@ export class OrderService {
     }
   }
 
-  private async updateStock(order: Order) {
-    console.log(order);
-    try {
-      const existingProduct = await this.prisma.product.findFirst({
-        where: {
-          kuinId: order.kuinId,
-        },
-        include: {
-          stock: true,
-        },
-      });
-
-      console.log(existingProduct);
-
-      if (!existingProduct) {
-        throw new NotFoundException(
-          `Unable to find product with kuinId ${order.kuinId}`,
-        );
-      }
-
-      await this.prisma.stock.update({
-        where: {
-          productUuid: existingProduct?.uuid,
-        },
-        data: {
-          quantity: {
-            increment: order?.quantity,
-          },
-        },
-      });
-    } catch (e) {
-      Logger.error(e);
-    }
-  }
-
   public async createOrder(body: CreateOrderDto, user: UserDto) {
     console.log(body.pricePerUnit);
     try {
@@ -136,6 +102,66 @@ export class OrderService {
         },
         include: {
           product: true,
+        },
+      });
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
+  //  update order status
+  async updateOrder(body: OrderDto, user: UserDto) {
+    try {
+      const order = await this.prisma.order.update({
+        where: {
+          uuid: body.uuid,
+        },
+        data: {
+          status: body.status,
+        },
+        include: {
+          product: true,
+        },
+      });
+
+      if (order.status === Status.COMPLETED) {
+        await this.updateStock(order);
+      }
+
+      return order;
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
+  private async updateStock(order: Order) {
+    console.log(order);
+    try {
+      const existingProduct = await this.prisma.product.findFirst({
+        where: {
+          kuinId: order.kuinId,
+        },
+        include: {
+          stock: true,
+        },
+      });
+
+      console.log(existingProduct);
+
+      if (!existingProduct) {
+        throw new NotFoundException(
+          `Unable to find product with kuinId ${order.kuinId}`,
+        );
+      }
+
+      await this.prisma.stock.update({
+        where: {
+          productUuid: existingProduct?.uuid,
+        },
+        data: {
+          quantity: {
+            increment: order?.quantity,
+          },
         },
       });
     } catch (e) {

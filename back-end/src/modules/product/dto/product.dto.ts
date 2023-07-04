@@ -20,10 +20,29 @@ export class ProductDto {
   @ApiProperty({
     nullable: true,
   })
-  kuinId?: number;
+  @ApiProperty()
+  kuinId: number;
+
+  @ApiProperty()
+  height_cm: number;
+
+  @ApiProperty()
+  width_cm: number;
+
+  @ApiProperty()
+  depth_cm: number;
+
+  @ApiProperty()
+  weight_gr: number;
 
   @ApiProperty({
     type: StockDto,
   })
   stock: StockDto;
+
+  @ApiProperty()
+  categoryUuid: string;
+
+  @ApiProperty()
+  barcode: string;
 }

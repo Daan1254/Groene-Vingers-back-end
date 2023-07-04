@@ -41,7 +41,6 @@ export class UserController {
   }
 
   @Post()
-  @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
   @UseGuards(AuthGuard)
   @ApiBody({ type: CreateEditUserDto })
   public async createUser(

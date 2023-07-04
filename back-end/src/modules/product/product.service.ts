@@ -12,12 +12,14 @@ import { KuinOrderDto } from './dto/kuin-order.dto';
 import { Product } from '@prisma/client';
 import { OrderService } from '../order/order.service';
 import { UserDto } from '../auth/dto/user.dto';
+import { ProductGateway } from './product.gateway';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly httpService: HttpService,
+    private readonly productGateway: ProductGateway,
     private readonly orderService: OrderService,
   ) {}
 
@@ -83,6 +85,50 @@ export class ProductService {
       throw new NotFoundException('Product niet gevonden');
     }
   }
+
+  async getProductsByCategory(uuid: string) {
+    try {
+      return await this.prisma.product.findMany({
+        where: {
+          categoryUuid: uuid,
+        },
+        include: {
+          stock: true,
+        },
+      });
+    } catch (e) {
+      Logger.error(e);
+    }
+  }
+
+  // create product
+  // async createProduct(productDto: ProductDto) {
+  //   try {
+  //     const createdProduct = await this.prisma.product.create({
+  //       data: {
+  //         ...productDto,
+  //         stock: undefined,
+  //       },
+  //     });
+  //
+  //     if (productDto.stock) {
+  //       await this.prisma.stock.create({
+  //         data: {
+  //           quantity: productDto.stock.quantity,
+  //           product: {
+  //             connect: {
+  //               uuid: createdProduct.uuid,
+  //             },
+  //           },
+  //         },
+  //       });
+  //     }
+  //
+  //     return createdProduct;
+  //   } catch (e) {
+  //     Logger.error(e);
+  //   }
+  // }
 
   async orderKuinProduct(body: CreateProductDto, user: UserDto) {
     console.log(body);
@@ -152,6 +198,28 @@ export class ProductService {
       return product > 0;
     } catch (e) {
       Logger.error(e);
+    }
+  }
+
+  // get product on barcode
+  async getProductByBarcode(barcode: string) {
+    try {
+      const product = await this.prisma.product.findUnique({
+        where: {
+          barcode,
+        },
+        include: {
+          stock: true,
+        },
+      });
+
+      // Send product to client
+      this.productGateway.sendProduct(product);
+
+      return product;
+    } catch (e) {
+      Logger.error(e);
+      throw new NotFoundException('Product niet gevonden');
     }
   }
 

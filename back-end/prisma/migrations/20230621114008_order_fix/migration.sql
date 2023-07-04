@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `order` ADD COLUMN `quanityUpdated` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `orderId` INTEGER NULL AUTO_INCREMENT;

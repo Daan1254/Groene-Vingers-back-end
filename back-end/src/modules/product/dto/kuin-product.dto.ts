@@ -1,18 +1,42 @@
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class KuinProductDto {
-    @ApiProperty()
-    id: string
+  @ApiProperty()
+  uuid: string;
 
-    @ApiProperty()
-    name: string
+  @ApiProperty()
+  name: string;
 
-    @ApiProperty()
-    price: string
+  @ApiProperty()
+  price: string;
 
-    @ApiProperty()
-    soldOut: boolean
+  @ApiProperty()
+  description: string;
 
-    @ApiProperty()
-    active: boolean
+  @ApiProperty()
+  image: string;
+
+  @ApiProperty({
+    nullable: true,
+  })
+  @ApiProperty()
+  kuinId: number;
+
+  @ApiProperty()
+  height_cm: number;
+
+  @ApiProperty()
+  width_cm: number;
+
+  @ApiProperty()
+  depth_cm: number;
+
+  @ApiProperty()
+  weight_gr: number;
+
+  @ApiProperty()
+  categoryUuid: string;
+
+  @ApiProperty()
+  barcode: string;
 }

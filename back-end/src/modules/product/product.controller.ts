@@ -31,6 +31,16 @@ export class ProductController {
     return await this.productService.getKuinProduct(id);
   }
 
+  @Get('')
+  async getProducts() {
+    return this.productService.getProducts();
+  }
+
+  @Get('category/:uuid')
+  async getProductsByCategory(@Param('uuid') uuid: string) {
+    return await this.productService.getProductsByCategory(uuid);
+  }
+
   @Post('kuin')
   @UseGuards(AuthGuard)
   @ApiHeaders([{ name: 'auth-token', description: 'Groene vingers API token' }])
@@ -41,13 +51,20 @@ export class ProductController {
     return await this.productService.orderKuinProduct(body, request.user);
   }
 
-  @Get('')
-  async getProducts() {
-    return this.productService.getProducts();
-  }
-
   @Get(':uuid')
   async getProduct(@Param('uuid') uuid: string) {
     return await this.productService.getProduct(uuid);
   }
+
+  @Get('barcode/:barcode')
+  async getProductByBarcode(@Param('barcode') barcode: string) {
+    console.log(barcode);
+    return await this.productService.getProductByBarcode(barcode);
+  }
+
+  // @Post('create')
+  // async createProduct(@Body() productDto: ProductDto) {
+  //   return await this.productService.createProduct(productDto);
+  // }
+  // create product if needed
 }

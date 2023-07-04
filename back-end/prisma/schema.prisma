@@ -48,19 +48,29 @@ model Appointment {
 }
 
 model Product {
-  uuid        String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  price       Int
-  imageUrl    String?
-  kuinId      Int?
-  stock       stock?
-  height_cm   Int?
-  width_cm    Int?
-  depth_cm    Int?
-  weight_gr   Int?
-  createdAt   DateTime @default(now())
-  Order       Order[]
+  uuid         String    @id @default(uuid())
+  name         String    @unique
+  description  String?
+  price        Int
+  imageUrl     String?
+  kuinId       Int?
+  stock        stock?
+  height_cm    Int?
+  width_cm     Int?
+  depth_cm     Int?
+  weight_gr    Int?
+  createdAt    DateTime  @default(now())
+  barcode      String?   @unique
+  categoryUuid String?
+  Category     Category? @relation(fields: [categoryUuid], references: [uuid])
+  Order        Order[]
+}
+
+model Category {
+  uuid        String    @id @default(uuid())
+  name        String
+  description String
+  products    Product[]
 }
 
 model Order {
@@ -71,7 +81,7 @@ model Order {
   productUuid     String?
   kuinId          Int?
   quantity        Int
-  orderId         Int?     @unique
+  orderId         Int?     @unique @default(autoincrement())
   price           Int
   status          Status   @default(PROCESSING)
   quantityUpdated Boolean  @default(false)
@@ -81,6 +91,7 @@ model Order {
 enum Status {
   PROCESSING
   COMPLETED
+  CANCELED
 }
 
 model stock {

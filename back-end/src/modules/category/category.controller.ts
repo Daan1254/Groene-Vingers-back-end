@@ -10,7 +10,7 @@ export class CategoryController {
 
   @Get('')
   public async getCategories() {
-    // return this.categoryService.getCategories()
+    return this.categoryService.getCategories();
   }
 
   @Post()
