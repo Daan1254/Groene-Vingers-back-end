@@ -5,6 +5,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -67,10 +71,11 @@ model Product {
 }
 
 model Category {
-  uuid        String    @id @default(uuid())
-  name        String
-  description String
-  products    Product[]
+  uuid         String    @id @default(uuid())
+  name         String
+  description  String
+  thumbnailUrl String?
+  products     Product[]
 }
 
 model Order {

@@ -14,5 +14,7 @@ export class CategoryController {
   }
 
   @Post()
-  public async createCategory(@Body() body: CreateEditCategoryDto) {}
+  public async createCategory(@Body() body: CreateEditCategoryDto) {
+    return await this.categoryService.createCategory(body);
+  }
 }

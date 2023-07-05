@@ -30,15 +30,18 @@
     "@nestjs/typeorm": "^9.0.1",
     "@nestjs/websockets": "^9.4.0",
     "@prisma/client": "^4.10.1",
+    "@prisma/generator-helper": "^4.16.2",
     "@types/bcrypt": "^5.0.0",
     "axios": "^1.3.4",
     "bcrypt": "5.0.0",
     "dotenv": "^16.0.3",
     "prisma": "^4.10.1",
+    "prisma-erd-generator": "^1.6.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"
   },
   "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^10.2.2",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
